@@ -55,6 +55,13 @@ prod xs = foldr1 (*) xs
 sumsucc :: [Int] -> Int
 sumsucc [x, y] = sum (take 2 (repeat 3)) 
 -- | Retornar reverso de lista sin reverse (f48)
-rev ::
-rev [xs] = foldl (flip (:)) [] xs
+--  foldl (:) [] [1,2,3] --> tira error porque [] (:) Num x no se puede.
+--  Se pretende lograr algo del estilo (:) Num x []
+--  flip :: (a -> b -> c) -> b -> a -> c, usando los mismos parametros;
+--  (flip (:)) [] Num x -> Num x : []
+--  (flip (:)) [] toma el segundo parametro y obtiene el primero de la llamada
+--  de la función.
+-- flip (:) [] 3 --> [] (:) 3
+rev :: Foldable t => [t a] -> [a]
+rev = foldl (flip (:)) []
 
