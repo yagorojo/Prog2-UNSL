@@ -114,6 +114,7 @@ f5prod [x] = x
 f5prod (x:xs) = x * f5prod xs
 
 -- | f47 con recursión (f51)
+f5sumsucc :: (Eq a, Num a) => [a] -> a
 f5sumsucc [_, 0] = 0
 f5sumsucc [x, 1] = x
 f5sumsucc [x, y] = x + f5sumsucc [x, y - 1]
