@@ -1,0 +1,6 @@
+Carrera: Licenciatura en Computacion 
+Materia: Programación II - 2020
+
+
+
+Documentación generada con Haddock <http://www.haskell.org/haddock/doc/html/index.html>  para el práctico de programación declarativa funcional en lenguaje Haskell.

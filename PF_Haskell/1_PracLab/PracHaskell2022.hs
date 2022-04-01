@@ -92,7 +92,9 @@ f5longi (_:xs) = 1 + f5longi xs
 -- | f42 con recursión (f51)
 f5cuentaE :: (Num p, Eq t) => t -> [t] -> p
 f5cuentaE y [] = 0
-f5cuentaE y (x:xs) = cmp x y + f5cuentaE y xs
+f5cuentaE y (x:xs)
+  | x == y = 1 + f5cuentaE y xs
+  | otherwise = f5cuentaE y xs
 
 -- | f43 con recursión (f51)
 f5find _ [] = False
@@ -104,9 +106,6 @@ f5find y (x:xs)
 f5double ::  [a] -> [a]
 f5double [] = []
 f5double (x:xs) = x:x:f5double xs
-
--- | f45 con recursión (f51)
-
 
 -- | f46 con recursión (f51)
 f5prod :: Num a => [a] -> a
@@ -138,11 +137,73 @@ f5revll (x:xs) = reverse x : f5revll xs
 --
 ------------------------------------------------
 
+-- | (f61)
+f6longi :: Num t => [a] -> t
+f6longi xs = f6longi' xs 0
+  where
+    f6longi' [] n = n
+    f6longi' (_:xs) n = f6longi' xs (n + 1)
+
+-- | (f62)
+f6cuentaE :: (Eq t1, Num t2) => [t1] -> t1 -> t2
+f6cuentaE xs y = f6cuentaE' xs y 0
+  where
+    f6cuentaE' [] _ n = n
+    f6cuentaE' (x:xs) y n 
+      | x == y = f6cuentaE' xs y (n + 1)
+      | otherwise = f6cuentaE' xs y n
+
+-- | (f63) Resuelto en el ejercicio 5.
+
+-- | (f64)
+f6double :: [a] -> [a]
+f6double xs = f6double' xs []
+  where
+    f6double' [] l = l
+    f6double' (x:xs) l = f6double' xs (x:x:l)
+
+-- | (f65)
+
+-- | (f66)
+f6prod :: Num a => [a] -> a
+f6prod [] = 0
+f6prod xs = f6prod' xs 1
+  where 
+    f6prod' [] n = n
+    f6prod' (x:xs) n = f6prod' xs (x * n) 
+
+-- | (f67)
+f6sumsucc :: [Int] -> Int
+f6sumsucc [x, y] = f6sumsucc' (replicate x y) 0
+  where
+    f6sumsucc' [] n = n
+    f6sumsucc' (x:xs) n = f6sumsucc' xs (n + x)
+
+-- | (f68)
+f6rev :: [a] -> [a]
+f6rev xs = f6rev' xs []
+  where
+    f6rev' [] l = l
+    f6rev' (x:xs) l = f6rev' xs (x:l)
+
+-- | (f69)
+f6revll :: [[a]] -> [[a]]
+f6revll xs = f6revll' xs []
+  where
+    f6revll' [] l = l
+    f6revll' (x:xs) l = f6revll' xs $ reverse x : l
+
 ------------------------------------------------
 --
--- Extras.
+-- Ejercicio 7.
 --
 ------------------------------------------------
 
-cmp x y | x == y = 1
-        | otherwise = 0
+-- | (f71)
+f7longi :: (Foldable t, Num a1) => t a2 -> a1
+f7longi = foldr (\_ x -> x + 1) 0 
+
+-- | (f72)
+f7cuentaE x xs = foldr (==x) 0 xs
+
+-- | (f78) Resuelto en el ejercicio 4 /f48/
