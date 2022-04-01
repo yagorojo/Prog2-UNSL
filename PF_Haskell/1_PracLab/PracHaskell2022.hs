@@ -129,7 +129,10 @@ f5revll [] = []
 f5revll (x:xs) = reverse x : f5revll xs 
 
 -- | (f53)
+f x = foldr (\x y -> x*2 : y) [] [1..x]
 
+-- | (f54)
+f' x n = foldr (\h y -> x*h : y) [] [1..n]
 
 ------------------------------------------------
 --
@@ -161,8 +164,6 @@ f6double xs = f6double' xs []
   where
     f6double' [] l = l
     f6double' (x:xs) l = f6double' xs (x:x:l)
-
--- | (f65)
 
 -- | (f66)
 f6prod :: Num a => [a] -> a
@@ -204,6 +205,21 @@ f7longi :: (Foldable t, Num a1) => t a2 -> a1
 f7longi = foldr (\_ x -> x + 1) 0 
 
 -- | (f72)
-f7cuentaE x xs = foldr (==x) 0 xs
+-- Revisa esto.
+f7cuentaE x xs = foldl (\n y -> if y == x then n+1 else n) 0 xs
+
+-- | (f73)
+f7find x xs = foldr (\n acc -> acc || n == x) False xs
+
+-- | (f74)
+f7double xs = foldr (\n acc -> n:n:acc) [] xs
+
+-- | (f76) Resuelto en el ejercicio 4 /f46/
+
+-- | (f77)
+f7sumsucc [a, b] = foldr1 (+) (replicate a b)
 
 -- | (f78) Resuelto en el ejercicio 4 /f48/
+
+-- | (f79)
+-- f7revll = foldr (\x acc -> reverse x : acc) []
