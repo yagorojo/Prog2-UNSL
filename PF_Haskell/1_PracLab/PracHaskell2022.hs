@@ -14,7 +14,7 @@ module PracHask2022 (
 -- *** Ejercicio 4 - Uso de combinadores básicos sobre funciones primitivas
 f4longi, f4longi', f4longi'', f4cuentaE, find, double, double', double', greater, prod, sumsucc, rev, revll,
 -- *** Ejercicio 5 – Funciones definidas recursivamente
-f5longi, f5cuentaE, f5find, f5double, f5prod, f5sumsucc, f5rev, f5revll,
+f5longi, f5cuentaE, f5find, f5double, f5greater, f5prod, f5sumsucc, f5rev, f5revll,
 -- *** Ejercicio 6 - Funciones recursivas con acumuladores
 f6longi, f6cuentaE, f6double, f6prod, f6sumsucc, f6rev, f6revll,
 -- *** Ejercicio 7 - Uso de patrones de recursión predefinidos
@@ -116,10 +116,18 @@ f5double ::  [a] -> [a]
 f5double [] = []
 f5double (x:xs) = x:x:f5double xs
 
+-- | f45 con recursión (f51)
+f5greater :: Num p => [a1] -> [a2] -> p
+f5greater [] [] = 0
+f5greater (_:xs) [] = 1
+f5greater [] (_:xs) = 2
+f5greater (_:xs) (_:ys) = f5greater xs ys
+
 -- | f46 con recursión (f51)
 f5prod :: Num a => [a] -> a
 f5prod [x] = x
 f5prod (x:xs) = x * f5prod xs
+
 
 -- | f47 con recursión (f51)
 f5sumsucc :: (Eq a, Num a) => [a] -> a
