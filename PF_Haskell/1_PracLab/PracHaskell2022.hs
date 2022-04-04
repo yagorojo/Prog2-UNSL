@@ -1,18 +1,31 @@
-------------------------------------------------
--- Module : PracHask2022
--- Developer :
--- Maintainer :
--- Stability : experimental
--- Portability : experimental
---
--- <Materia> - Practico Haskell <Año>
-------------------------------------------------
+{-|
+Module      : PracHask2022
+Description : Practico Haskell 2022 - Yago Rojo
+Developer   :
+Maintainer  :
 
-module PracHask2022 () where
+Stability   : experimental
+Portability : experimental
+
+Programacion 2 - Practico Haskell 2022
+-}
+
+module PracHask2022 (
+-- *** Ejercicio 4 - Uso de combinadores básicos sobre funciones primitivas
+f4longi, f4longi', f4longi'', f4cuentaE, find, double, double', double', greater, prod, sumsucc, rev, revll,
+-- *** Ejercicio 5 – Funciones definidas recursivamente
+f5longi, f5cuentaE, f5find, f5double, f5prod, f5sumsucc, f5rev, f5revll,
+-- *** Ejercicio 6 - Funciones recursivas con acumuladores
+f6longi, f6cuentaE, f6double, f6prod, f6sumsucc, f6rev, f6revll,
+-- *** Ejercicio 7 - Uso de patrones de recursión predefinidos
+f7longi, f7cuentaE, f7find, f7double, f7sumsucc, f7revll,
+-- (foldr: catamorfismos sobre estructuras para operadores asociativos a derecha)
+-- (foldl: catamorfismos sobre estructuras para operadores asociativos a izquierda)
+) where
 
 ------------------------------------------------
 --
---  Ejercicio 4.
+-- Ejercicio 4.
 --
 ------------------------------------------------
 
@@ -44,10 +57,6 @@ double xs = take ((length xs) * 2) (cycle xs)
 double' :: [a] -> [a]
 double' xs = (++) xs xs
 
--- | double con concatMap (f44)
-double'' :: Foldable t => t b -> [b]
-double'' = concatMap (replicate 2)
-
 -- | Retorna 1 si xs > xy, 2 si xs < xy, 0 si xs = xy (f45)
 greater :: (Ord a, Num p) => a -> a -> p
 greater xs ys 
@@ -63,7 +72,6 @@ prod xs = foldr1 (*) xs
 sumsucc :: [Int] -> Int
 sumsucc [x, y] = sum (take x (repeat y)) 
 
--- | Retornar reverso de lista sin reverse (f48)
 --  foldl (:) [] [1,2,3] --> tira error porque [] (:) Num x no se puede.
 --  Se pretende lograr algo del estilo (:) Num x []
 --  flip :: (a -> b -> c) -> b -> a -> c, usando los mismos parametros;
@@ -71,6 +79,7 @@ sumsucc [x, y] = sum (take x (repeat y))
 --  (flip (:)) [] toma el segundo parametro y obtiene el primero de la llamada
 --  de la función.
 -- flip (:) [] 3 --> [] (:) 3
+-- | Retornar reverso de lista sin reverse (f48)
 rev :: Foldable t => t a -> [a]
 rev = foldl (flip (:)) []
 
@@ -129,7 +138,10 @@ f5revll [] = []
 f5revll (x:xs) = reverse x : f5revll xs 
 
 -- | (f53)
-f x = foldr (\x y -> x*2 : y) [] [1..x]
+f2 x = f2' [1..x] []
+  where
+    f2' [] y = y 
+    f2' (x:xs) y = x*2 : f2' xs y
 
 -- | (f54)
 f' x n = foldr (\h y -> x*h : y) [] [1..n]
@@ -140,14 +152,14 @@ f' x n = foldr (\h y -> x*h : y) [] [1..n]
 --
 ------------------------------------------------
 
--- | (f61)
+-- |f4longi con acumuladores. (f61)
 f6longi :: Num t => [a] -> t
 f6longi xs = f6longi' xs 0
   where
     f6longi' [] n = n
     f6longi' (_:xs) n = f6longi' xs (n + 1)
 
--- | (f62)
+-- | f4cuentaE con acumuladores. (f62)
 f6cuentaE :: (Eq t1, Num t2) => [t1] -> t1 -> t2
 f6cuentaE xs y = f6cuentaE' xs y 0
   where
@@ -156,16 +168,16 @@ f6cuentaE xs y = f6cuentaE' xs y 0
       | x == y = f6cuentaE' xs y (n + 1)
       | otherwise = f6cuentaE' xs y n
 
--- | (f63) Resuelto en el ejercicio 5.
+-- (f63) Resuelto en el ejercicio 5.
 
--- | (f64)
+-- | double con acumuladores. (f64)
 f6double :: [a] -> [a]
 f6double xs = f6double' xs []
   where
     f6double' [] l = l
     f6double' (x:xs) l = f6double' xs (x:x:l)
 
--- | (f66)
+-- | prod con acumuladores. (f66)
 f6prod :: Num a => [a] -> a
 f6prod [] = 0
 f6prod xs = f6prod' xs 1
@@ -173,21 +185,21 @@ f6prod xs = f6prod' xs 1
     f6prod' [] n = n
     f6prod' (x:xs) n = f6prod' xs (x * n) 
 
--- | (f67)
+-- | sumsucc con acumuladores. (f67)
 f6sumsucc :: [Int] -> Int
 f6sumsucc [x, y] = f6sumsucc' (replicate x y) 0
   where
     f6sumsucc' [] n = n
     f6sumsucc' (x:xs) n = f6sumsucc' xs (n + x)
 
--- | (f68)
+-- | rev con acumuladores. (f68)
 f6rev :: [a] -> [a]
 f6rev xs = f6rev' xs []
   where
     f6rev' [] l = l
     f6rev' (x:xs) l = f6rev' xs (x:l)
 
--- | (f69)
+-- | revll con acumuladores. (f69)
 f6revll :: [[a]] -> [[a]]
 f6revll xs = f6revll' xs []
   where
@@ -200,26 +212,34 @@ f6revll xs = f6revll' xs []
 --
 ------------------------------------------------
 
--- | (f71)
+-- | f4longi con folding, no importa el orden solo consumir la lista, así que usé foldr (f71)
 f7longi :: (Foldable t, Num a1) => t a2 -> a1
 f7longi = foldr (\_ x -> x + 1) 0 
 
--- | (f72)
--- Revisa esto.
-f7cuentaE x xs = foldl (\n y -> if y == x then n+1 else n) 0 xs
+-- | f4cuentaE con folding, no importa el orden solo consumir la lista, así que usé foldr (f72)
+f7cuentaE :: (Foldable t, Eq a1, Num a2) => a1 -> t a1 -> a2
+f7cuentaE x xs = foldr (\y acc -> if y == x then acc + 1 else acc) 0 xs
 
--- | (f73)
+-- | find con folding, no importa el orden solo consumir la lista, así que usé foldr (f73)
+f7find :: (Foldable t, Eq a) => a -> t a -> Bool
 f7find x xs = foldr (\n acc -> acc || n == x) False xs
 
--- | (f74)
+-- | double con folding, la lista no requiere orden en particular, solo duplicarlos, así que usé foldr (f74)
+f7double :: Foldable t => t a -> [a]
 f7double xs = foldr (\n acc -> n:n:acc) [] xs
 
--- | (f76) Resuelto en el ejercicio 4 /f46/
+-- (f76) Resuelto en el ejercicio 4 /f46/
 
--- | (f77)
+-- | sumsucc con folding, genera una lista y la suma, la suma es asociativa así que usé foldr(f77)
+f7sumsucc :: [Int] -> Int
 f7sumsucc [a, b] = foldr1 (+) (replicate a b)
 
--- | (f78) Resuelto en el ejercicio 4 /f48/
+-- (f78) Resuelto en el ejercicio 4 /f48/
 
--- | (f79)
--- f7revll = foldr (\x acc -> reverse x : acc) []
+{-| revll con fold, en este ejercicio importa el orden ya que no quiero alterar el orden de la lista
+  si no más bien el orden de sus elementos (listas), que sea asociativo a derecha me permite agregar
+  elementos en la lista de ultimo a primero, esto no cambia su orden, si usase foldl se agregarian de
+  primero a ultimo resultando en una lista con un reverse (f79)
+-}
+f7revll :: [[a]] -> [[a]]
+f7revll xs = foldr (\x acc -> reverse x : acc) [] xs
