@@ -9,9 +9,9 @@ module LabH2022 where
 -- Funciones solicitadas en ejs.1,2,3
 {- ej. 4.a
 Expresion: map item tabla1S
---- Completar---
+-- Devuelve una lista con los nombres de cada producto en tabla1S
 Expresion: filter ((==200).codItem)tabla1S
---- Completar---
+-- Devuelve una lista con cada elemento que tenga como codigo de producto 200
 -}
 -- Funcion solicitada en ej.4.a) fReponer
 -- Funcion solicitada en ej.4.b) increPU
@@ -65,6 +65,9 @@ codItem (cod,item,marca,rubro,prov,umed,cant,cmin,cmax,preciou,pgan)= cod
 item (cod,item,marca,rubro,prov,umed,cant,cmin,cmax,preciou,pgan) = item
 precioU (cod,item,marca,rubro,prov,umed,cant,cmin,cmax,preciou,pgan)= preciou
 pganancia (cod,item,marca,rubro,prov,umed,cant,cmin,cmax,preciou,pgan)= pgan
+cant (cod,item,marca,rubro,prov,umed,cant,cmin,cmax,preciou,pgan)= cant
+cmin (cod,item,marca,rubro,prov,umed,cant,cmin,cmax,preciou,pgan)= cmin
+
 -- y así para cada elemento de la tupla(completar el codigo si es necesario)
 -- datos predefinidos (Ejemplo)
 tabla1S:: T_Stock
@@ -91,22 +94,20 @@ tabla1P= [ (20,"Juan Perez","Belgrano 1827, San Luis, 5700, Argentina","2664-786
 --
 -------------------------------------------------------------------------------
 
--- mapTup :: (a -> b) -> (c -> d)-> [(a,c)] -> [(b,d)]
--- mapTup f g xs = 1
+-- En el caso de las recursiones de cola la lista queda revertida, teniendole
+-- que hacer un reverse para volverla al orden original, por eso no las hice
+
+mapTup :: (a -> b) -> (c -> d) -> [(a,c)] -> [(b,d)]
+mapTup f g xs = map (\ t -> (f (fst t), g (snd t))) xs
 
 -- Recursión controlada.
-mapTupR :: (a -> b) -> (c -> d)-> [(a,c)] -> [(b,d)]
+mapTupR :: (a -> b) -> (c -> d) -> [(a,c)] -> [(b,d)]
 mapTupR _ _ [] = []
 mapTupR f g (x:xs) = (f (fst x), g (snd x)) : mapTupR f g xs
 
--- Recursión de cola.
-mapTupRA :: (a -> b) -> (c -> d)-> [(a,c)] -> [(b,d)]
-mapTupRA _ _ [] = []
-mapTupRA f g xs = mapTupRA' f g xs []
-  where
-    mapTupRA' _ _ [] acc = acc
-    mapTupRA' f g (x:xs) acc = mapTupRA' f g xs ((f (fst x), g (snd x)):acc)
-
+-- foldr
+mapTupfr :: (a -> b) -> (c -> d) -> [(a,c)] -> [(b,d)]
+mapTupfr f g xs = foldr (\x acc -> (f (fst x), g (snd x)) : acc) [] xs
 
 -------------------------------------------------------------------------------
 --
@@ -114,10 +115,28 @@ mapTupRA f g xs = mapTupRA' f g xs []
 --
 -------------------------------------------------------------------------------
 
--- allTup ::(a -> Bool) -> (b -> Bool) -> [(a,b)] -> Bool
-allTupR ::(a -> Bool) -> (b -> Bool) -> [(a,b)] -> Bool
+allTup :: (a -> Bool) -> (b -> Bool) -> [(a,b)] -> Bool
+allTup f g xs = all (\x -> f (fst x) && g (snd x)) xs
+
+-- Recursión controlada.
+allTupR :: (a -> Bool) -> (b -> Bool) -> [(a,b)] -> Bool
 allTupR _ _ [] = True
 allTupR f g (x:xs) = f (fst x) && g (snd x) && allTupR f g xs 
+
+-- Recursión de cola.
+allTupRA :: (a -> Bool) -> (b -> Bool) -> [(a,b)] -> Bool
+allTupRA f g xs = allTupRA' f g xs True
+  where
+    allTupRA' _ _ [] a = a
+    allTupRA' f g (x:xs) a = allTupRA' f g xs (f (fst x) && g (snd x) && a)
+
+-- foldr
+allTupfr :: (a -> Bool) -> (b -> Bool) -> [(a,b)] -> Bool
+allTupfr f g xs = foldr (\x acc -> f (fst x) && g (snd x) && acc) True xs
+
+-- foldl
+allTupfl :: (a -> Bool) -> (b -> Bool) -> [(a,b)] -> Bool
+allTupfl f g xs = foldl (\acc x -> f (fst x) && g (snd x) && acc) True xs
 
 -------------------------------------------------------------------------------
 --
@@ -125,9 +144,38 @@ allTupR f g (x:xs) = f (fst x) && g (snd x) && allTupR f g xs
 --
 -------------------------------------------------------------------------------
 
+-- Mismo caso que con mapTup.
+
+filterTup :: (a -> Bool) -> (b -> Bool) -> [(a,b)] -> [(a,b)]
+filterTup f g xs = filter (\x -> (f (fst x) && g (snd x))) xs
+
+-- Recursión controlada.
+filterTupR _ _ [] = []
+filterTupR f g (x:xs)
+  | (f (fst x) && g (snd x)) = x : filterTupR f g xs
+  | otherwise = filterTupR f g xs
+
+-- foldr
+filterTupfr :: (a -> Bool) -> (b -> Bool) -> [(a,b)] -> [(a,b)]
+filterTupfr f g xs = foldr aux [] xs
+  where 
+    aux x xs = if f (fst x) && g (snd x) then x : xs else xs
+
 -------------------------------------------------------------------------------
 --
 -- Ejercicio 4
 --
 -------------------------------------------------------------------------------
 
+increPU
+  :: Fractional j =>
+     [(a, b, c, d, e, f, g, h, i, j, k)]
+     -> j -> [(a, b, c, d, e, f, g, h, i, j, k)]
+increPU xs n = map (\(a,b,c,d,e,f,g,h,i,price,k) -> 
+  (a,b,c,d,e,f,g,h,i,(1+n/100)*price,k)) xs
+
+fReponer
+  :: Ord g =>
+     [(a, b, c, d, e, f, g, g, i, j, k)]
+     -> [(a, b, c, d, e, f, g, g, i, j, k)]
+fReponer xs = filter (\x -> cant x < cmin x) xs
