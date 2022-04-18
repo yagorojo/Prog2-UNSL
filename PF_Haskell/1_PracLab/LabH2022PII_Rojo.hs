@@ -94,9 +94,6 @@ tabla1P= [ (20,"Juan Perez","Belgrano 1827, San Luis, 5700, Argentina","2664-786
 --
 -------------------------------------------------------------------------------
 
--- En el caso de las recursiones de cola la lista queda revertida, teniendole
--- que hacer un reverse para volverla al orden original, por eso no las hice
-
 mapTup :: (a -> b) -> (c -> d) -> [(a,c)] -> [(b,d)]
 mapTup f g xs = map (\ t -> (f (fst t), g (snd t))) xs
 
@@ -105,9 +102,20 @@ mapTupR :: (a -> b) -> (c -> d) -> [(a,c)] -> [(b,d)]
 mapTupR _ _ [] = []
 mapTupR f g (x:xs) = (f (fst x), g (snd x)) : mapTupR f g xs
 
+-- Recursión de cola.
+mapTupRA :: (a -> b) -> (c -> d) -> [(a,c)] -> [(b,d)]
+mapTupRA f g xs = mapTupRA' f g xs []
+  where
+    mapTupRA' _ _ [] acc = acc
+    mapTupRA' f g (x:xs) acc = mapTupRA' f g xs (acc ++ [(f (fst x), g (snd x))])
+
 -- foldr
 mapTupfr :: (a -> b) -> (c -> d) -> [(a,c)] -> [(b,d)]
 mapTupfr f g xs = foldr (\x acc -> (f (fst x), g (snd x)) : acc) [] xs
+
+-- foldl
+mapTupfl :: (a -> b) -> (c -> d) -> [(a,c)] -> [(b,d)]
+mapTupfl f g xs = foldl (\acc x -> acc ++ [(f (fst x), g (snd x))]) [] xs
 
 -------------------------------------------------------------------------------
 --
@@ -144,8 +152,6 @@ allTupfl f g xs = foldl (\acc x -> f (fst x) && g (snd x) && acc) True xs
 --
 -------------------------------------------------------------------------------
 
--- Mismo caso que con mapTup.
-
 filterTup :: (a -> Bool) -> (b -> Bool) -> [(a,b)] -> [(a,b)]
 filterTup f g xs = filter (\x -> (f (fst x) && g (snd x))) xs
 
@@ -155,11 +161,24 @@ filterTupR f g (x:xs)
   | (f (fst x) && g (snd x)) = x : filterTupR f g xs
   | otherwise = filterTupR f g xs
 
+filterTupRA :: (a -> Bool) -> (b -> Bool) -> [(a,b)] -> [(a,b)]
+filterTupRA f g xs = filterTupRA' f g xs []
+  where
+    filterTupRA' _ _ [] acc = []
+    filterTupRA' f g (x:xs) acc
+      | (f (fst x) && g (snd x)) = filterTupRA' f g xs (acc++[x])
+      | otherwise = filterTupRA' f g xs acc
+
 -- foldr
 filterTupfr :: (a -> Bool) -> (b -> Bool) -> [(a,b)] -> [(a,b)]
 filterTupfr f g xs = foldr aux [] xs
   where 
     aux x xs = if f (fst x) && g (snd x) then x : xs else xs
+
+filterTupfl :: (a -> Bool) -> (b -> Bool) -> [(a,b)] -> [(a,b)]
+filterTupfl f g xs = foldl aux [] xs
+  where
+    aux xs x = if f (fst x) && g (snd x) then xs ++ [x] else xs
 
 -------------------------------------------------------------------------------
 --
